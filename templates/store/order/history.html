@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Pedidos - FERREMAS{% endblock %}
+
+{% block content %}
+<h1>Mis Pedidos</h1>
+
+{% if orders %}
+    <div class="accordion" id="orderHistoryAccordion">
+        {% for order in orders %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ order.id }}">
+                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ order.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ order.id }}">
+                    Pedido #{{ order.id }} - {{ order.created_at|date:"d/m/Y H:i" }} - Total: ${{ order.get_total_cost|floatformat:"0" }} CLP
+                    <span class="ms-auto badge bg-{% if order.paid %}success{% else %}warning text-dark{% endif %}">{% if order.paid %}Pagado{% else %}Pendiente de Pago{% endif %}</span>
+                </button>
+            </h2>
+            <div id="collapse{{ order.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ order.id }}" data-bs-parent="#orderHistoryAccordion">
+                <div class="accordion-body">
+                    <p><strong>Fecha:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Dirección de Envío:</strong> {{ order.address }}, {{ order.city }} {{ order.postal_code }}</p>
+                    <p><strong>Estado:</strong> {% if order.paid %}Pagado{% else %}Pendiente de Pago{% endif %}</p>
+                    <h5>Artículos:</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for item in order.items.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ item.quantity }} x {{ item.product.name }}</span>
+                            <span>${{ item.get_cost|floatformat:"0" }}</span>
+                        </li>
+                        {% endfor %}
+                         <li class="list-group-item d-flex justify-content-between align-items-center fw-bold bg-light">
+                            <span>Total</span>
+                            <span>${{ order.get_total_cost|floatformat:"0" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No tienes pedidos anteriores.</p>
+{% endif %}
+{% endblock %}

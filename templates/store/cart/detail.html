@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tu Carrito de Compras - FERREMAS{% endblock %}
+
+{% block content %}
+<h1>Tu Carrito de Compras</h1>
+
+{% if cart %}
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Imagen</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col" class="text-center">Cantidad</th>
+                    <th scope="col" class="text-end">Precio Unitario</th>
+                    <th scope="col" class="text-end">Subtotal</th>
+                    <th scope="col" class="text-center">Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                    {% with product=item.product %}
+                        <tr>
+                            <td>
+                                <a href="{{ product.get_absolute_url|default:"#" }}"> {# Asume que tienes get_absolute_url en el modelo Product #}
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="height: 50px; width: auto;">
+                                    {% else %}
+                                        <img src="{% static 'img/no_image.png' %}" alt="Sin imagen" style="height: 50px; width: auto;">
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <td><a href="{{ product.get_absolute_url|default:"#" }}" class="text-decoration-none">{{ product.name }}</a></td>
+                            <td class="text-center">
+                                <form action="{% url 'cart_add' product.id %}" method="post" class="d-inline-flex align-items-center justify-content-center">
+                                    {% csrf_token %}
+                                    {{ item.update_quantity_form.quantity }}
+                                    {{ item.update_quantity_form.update }}
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary ms-2" title="Actualizar cantidad">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-end">${{ item.price|floatformat:"0" }}</td>
+                            <td class="text-end">${{ item.total_price|floatformat:"0" }}</td>
+                            <td class="text-center">
+                                <form action="{% url 'cart_remove' product.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar del carrito">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                {% endfor %}
+            </tbody>
+             <tfoot>
+                <tr class="table-light">
+                    <td colspan="4" class="text-end fw-bold">Total</td>
+                    <td colspan="2" class="text-end fw-bold fs-5">${{ cart.get_total_price|floatformat:"0" }} CLP</td>
+                </tr>
+             </tfoot>
+        </table>
+    </div>
+    <div class="text-end mt-3">
+        <a href="{% url 'product_list' %}" class="btn btn-outline-secondary me-2">
+            <i class="bi bi-arrow-left-circle"></i> Seguir comprando
+        </a>
+        <a href="{% url 'order_create' %}" class="btn btn-primary">
+            <i class="bi bi-bag-check-fill"></i> Proceder al Pago
+        </a>
+    </div>
+{% else %}
+    <div class="alert alert-warning" role="alert">
+        Tu carrito está vacío. <a href="{% url 'product_list' %}" class="alert-link">¡Empieza a comprar!</a>
+    </div>
+{% endif %}
+
+{% endblock %}

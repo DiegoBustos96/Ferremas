@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - FERREMAS{% endblock %}
+
+{% block content %}
+<h1>Checkout</h1>
+
+<div class="row">
+    <div class="col-md-7 order-md-2 mb-4">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">Resumen del Pedido</span>
+            <span class="badge bg-secondary rounded-pill">{{ cart|length }}</span>
+        </h4>
+        <ul class="list-group mb-3">
+            {% for item in cart %}
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div>
+                    <h6 class="my-0">{{ item.product.name }}</h6>
+                    <small class="text-muted">Cantidad: {{ item.quantity }}</small>
+                </div>
+                <span class="text-muted">${{ item.total_price|floatformat:"0" }}</span>
+            </li>
+            {% endfor %}
+            <li class="list-group-item d-flex justify-content-between bg-light">
+                <span class="fw-bold">Total (CLP)</span>
+                <strong class="fs-5">${{ cart.get_total_price|floatformat:"0" }}</strong>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-md-5 order-md-1">
+        <h4 class="mb-3">Dirección de Envío</h4>
+        <form action="." method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    {{ form.first_name.label_tag }}
+                    {{ form.first_name }}
+                    <div class="invalid-feedback">{{ form.first_name.errors }}</div>
+                </div>
+                 <div class="col-sm-6">
+                    {{ form.last_name.label_tag }}
+                    {{ form.last_name }}
+                     <div class="invalid-feedback">{{ form.last_name.errors }}</div>
+                </div>
+
+                <div class="col-12">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    <div class="invalid-feedback">{{ form.email.errors }}</div>
+                </div>
+
+                <div class="col-12">
+                    {{ form.address.label_tag }}
+                    {{ form.address }}
+                    <div class="invalid-feedback">{{ form.address.errors }}</div>
+                </div>
+
+                <div class="col-md-7">
+                    {{ form.city.label_tag }}
+                    {{ form.city }}
+                    <div class="invalid-feedback">{{ form.city.errors }}</div>
+                </div>
+                <div class="col-md-5">
+                    {{ form.postal_code.label_tag }}
+                    {{ form.postal_code }}
+                    <div class="invalid-feedback">{{ form.postal_code.errors }}</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <p class="text-muted">
+                Al hacer clic en "Realizar Pedido", serás redirigido para completar tu compra.
+                (Nota: La integración con pasarelas de pago como Webpay no está incluida en este código base).
+            </p>
+
+            <button class="w-100 btn btn-primary btn-lg" type="submit">
+                <i class="bi bi-credit-card-fill"></i> Realizar Pedido
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

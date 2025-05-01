@@ -1,0 +1,65 @@
+  <a href="{% url 'product_detail' product.id product.slug %}" class="text-decoration-none text-dark">{{ product.name }}</a>
+                            </h5>
+                             <p class="card-text text-muted">{{ product.category.name }}</p>
+                            <p class="card-text fs-5 fw-bold text-success">${{ product.price|floatformat:"0" }} CLP</p>
+                             {% if product.stock <= 0 %}
+                                <span class="badge bg-danger">Agotado</span>
+                             {% elif product.stock < 10 %}
+                                 <span class="badge bg-warning text-dark">¡Últimas unidades!</span>
+                             {% else %}
+                                 <span class="badge bg-success">En Stock</span>
+                             {% endif %}
+                        </div>
+                         <div class="card-footer bg-transparent border-top-0">
+                             <a href="{% url 'product_detail' product.id product.slug %}" class="btn btn-outline-primary btn-sm w-100">Ver Detalles</a>
+                         </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p>No hay productos en esta categoría.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if category %}{{ category.name }}{% else %}Todos los Productos{% endif %} - FERREMAS
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <h3>Categorías</h3>
+        <div class="list-group">
+            <a href="{% url 'product_list' %}" class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                Todas
+            </a>
+            {% for c in categories %}
+                <a href="{% url 'product_list_by_category' c.slug %}" class="list-group-item list-group-item-action {% if category.slug == c.slug %}active{% endif %}">
+                    {{ c.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <h2>{% if category %}{{ category.name }}{% else %}Todos los Productos{% endif %}</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <a href="{% url 'product_detail' product.id product.slug %}">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                                <!-- <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"> -->
+                            {% else %}
+                                <img src="{% static 'img/no_image.png' %}" class="card-img-top" alt="Sin imagen">
+                            {% endif %}
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                              
